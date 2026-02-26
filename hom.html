@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Home Food </title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#f5f5f5}
+
+/* WELCOME SCREEN */
+.welcome{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+color:#fff;
+background:
+linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),
+url("https://images.unsplash.com/photo-1504674900247-0877df9cc836") center/cover
+}
+
+.welcome h1{font-size:60px;margin-bottom:20px}
+.startBtn{
+background:#ff3c00;
+color:#fff;
+border:none;
+padding:12px 30px;
+font-size:20px;
+cursor:pointer;
+border-radius:8px
+}
+
+.login{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:
+linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),
+url("https://images.unsplash.com/photo-1499028344343-cd173ffc68a9") center/cover
+}
+
+.box{background:#fff;padding:40px;border-radius:12px;width:320px;text-align:center}
+.box input{width:100%;padding:10px;margin:10px 0}
+
+.nav{
+background:#ff3c00;
+color:#fff;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 40px
+}
+
+.logo{display:flex;align-items:center;gap:10px;font-weight:bold;font-size:20px}
+.logo img{width:35px}
+
+.search{padding:6px}
+
+.hero{
+height:60vh;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+color:#fff;
+background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),
+url("https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1600") center/cover
+}
+
+.hero h1{font-size:40px}
+
+.section{padding:40px;text-align:center}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+max-width:1100px;
+margin:auto
+}
+
+.card{
+background:#fff;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 4px 10px rgba(0,0,0,.2);
+cursor:pointer;
+transition:.3s
+}
+
+.card:hover{transform:scale(1.05)}
+
+.card img{width:100%;height:150px;object-fit:cover}
+.card h3{padding:10px}
+
+.btn{
+background:#ff3c00;
+color:#fff;
+border:none;
+padding:7px 14px;
+margin:5px;
+cursor:pointer
+}
+
+#menu{
+max-width:600px;
+margin:auto;
+background:#fff;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,.2)
+}
+
+.notify{
+position:fixed;
+top:20px;
+right:-300px;
+background:#ff3c00;
+color:#fff;
+padding:15px;
+transition:.4s
+}
+
+.contact{
+background:#222;
+color:#fff;
+padding:40px;
+text-align:center
+}
+
+.contact a{
+color:#ff3c00;
+text-decoration:none;
+font-weight:bold
+}
+
+.thank{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.8);
+color:#fff;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+font-size:28px;
+z-index:999
+}
+</style>
+</head>
+
+<body>
+
+<div class="welcome" id="welcome">
+<h1>🍲 Home Food 🍛</h1>
+<button class="startBtn" onclick="startApp()">Get Started</button>
+</div>
+
+<div class="notify" id="notify"></div>
+
+<div class="login" id="login" style="display:none">
+<div class="box">
+<h2>Home Food</h2>
+<input id="email" type="email" placeholder="Email" required>
+<input id="pass"  type="password"  placeholder="Password (min 6 chars)" required>
+<button class="btn" onclick="loginUser()">Login</button>
+</div>
+</div>
+
+<div id="app" style="display:none">
+
+<div class="nav">
+<div class="logo">
+<img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
+<span>Home Food</span>
+</div>
+
+<div>
+<input id="search" class="search" placeholder="Search restaurant" onkeyup="searchRestaurant()">
+<button class="btn" onclick="filterFood('veg')">Veg</button>
+<button class="btn" onclick="filterFood('nonveg')">Non Veg</button>
+<button class="btn" onclick="loadRestaurants()">All</button>
+</div>
+</div>
+
+<section class="hero">
+<div>
+<h1>Hungry in Hostel? We Deliver Happiness 🍕</h1>
+<p>Hot meals from nearby restaurants straight to your gate</p>
+</div>
+</section>
+
+<section class="section">
+<h2>Restaurants</h2>
+<div class="cards" id="restaurants"></div>
+</section>
+
+<section class="section"><div id="menu"></div></section>
+
+<section class="section">
+<h2>Cart</h2>
+<div id="cart"></div>
+<h3 id="total"></h3>
+<h3>Select Payment</h3>
+<select id="payment">
+<option value="UPI">UPI</option>
+</select><br><br>
+<button class="btn" onclick="checkout()">Place Order</button>
+</section>
+
+<section class="section">
+<h2>Order Tracking</h2>
+<div id="orders"></div>
+</section>
+
+<section class="section">
+<h2>All Orders History</h2>
+<div id="orderHistory"></div>
+</section>
+
+</div>
+
+<section class="contact">
+<h2>Contact Us</h2>
+<p>Email: homefood@gmail.com</p>
+<p>Phone: +91 9876543210</p>
+<p>Address: home food , College Road, Andhra Pradesh, India</p>
+</section>
+
+<script>
+
+function startApp(){
+welcome.style.display="none"
+login.style.display="flex"
+}
+
+function loginUser(){
+let email = document.getElementById("email").value
+let p = pass.value
+
+let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+if(!emailPattern.test(email)){
+alert("Enter valid email address")
+return
+}
+
+if(p.length<6){
+alert("Password must be at least 6 characters")
+return
+}
+
+login.style.display="none"
+app.style.display="block"
+}
+
+let restaurants=[
+{name:"Tiffin Center",type:"veg",img:"https://tse2.mm.bing.net/th/id/OIP.7vmsjf6t0WNu18iVTPOAOwHaE8",
+menu:[{name:"Idly",price:40},{name:"Dosa",price:60},{name:"Poori",price:70},{name:"Upma pesaraattu",price:80},{name:"Porota",price:60},{name:"Chapati",price:50},{name:"Special Dosa",price:120}]},
+
+{name:"South Indian Thali",type:"veg",img:"https://blog.bigbasket.com/wp-content/uploads/2023/04/South-Indian-main_584509564.jpeg",
+menu:[{name:"Andhra Meals",price:120},{name:"Mini Meals",price:90},{name:"Curd Rice",price:60},{name:"Special Meals",price:170},{name:"Veg Thali",price:250},{name:"Non Veg Thali",price:320}]},
+
+{name:"Pizza Corner",type:"veg",img:"https://cdn.pixabay.com/photo/2020/05/17/04/22/pizza-5179939_1280.jpg",
+menu:[{name:"Margherita Pizza",price:180},{name:"Farmhouse Pizza",price:220},{name:"Paneer Pizza",price:240},{name:"Veggie Supreme",price:200},{name:"Cheese Burst",price:250},{name:"Mexican Wave",price:230}]},
+
+{name:"Fast Food Center",type:"nonveg",img:"https://images.unsplash.com/photo-1550547660-d9450f859349",
+menu:[{name:"Chicken Noodles",price:120},{name:"Egg Fried Rice",price:150},{name:"Chicken Manchurian",price:130},{name:"Burger",price:150},{name:"Wrap",price:130},{name:"Fries",price:80}]},
+
+{name:"spicy Non Veg",type:"nonveg",img:"https://img.freepik.com/premium-photo/assorted-indian-non-vegetarian-food-recipe-served-group-includes-chicken-curry-mutton-masala-anda-egg-curry-butter-chicken-biryani-tandoori-murg-chicken-tikka-naa-roti-ramadan_466689-40931.jpg?w=1380",
+menu:[{name:"Chicken Biryani",price:180},{name:"Mutton Biryani",price:220},{name:"Chicken Fry",price:160},{name:"Mutton Fry",price:200},{name:"Chicken 65",price:140},{name:"Mutton Chops",price:250}]},
+
+{name:"Ice Cream World",type:"veg",img:"https://images.unsplash.com/photo-1563805042-7684c019e1cb",
+menu:[{name:"Chocolate Ice Cream",price:90},{name:"Butterscotch",price:80},{name:"Sundae",price:120},{name:"Vanilla Cone",price:70},{name:"Strawberry",price:100},{name:"Mango",price:110}]}
+]
+
+let cart=JSON.parse(localStorage.getItem("cart")) || []
+let orders=JSON.parse(localStorage.getItem("orders")) || []
+let history=JSON.parse(localStorage.getItem("history")) || []
+
+function saveData(){
+localStorage.setItem("cart",JSON.stringify(cart))
+localStorage.setItem("orders",JSON.stringify(orders))
+localStorage.setItem("history",JSON.stringify(history))
+}
+
+function loadRestaurants(list=restaurants){
+restaurantsDiv.innerHTML=""
+list.forEach((r,i)=>{
+restaurantsDiv.innerHTML+=`<div class="card" onclick="openMenu(${i})"><img src="${r.img}"><h3>${r.name}</h3></div>`
+})
+}
+
+const restaurantsDiv=document.getElementById("restaurants")
+loadRestaurants()
+
+function searchRestaurant(){
+let v=search.value.toLowerCase()
+loadRestaurants(restaurants.filter(r=>r.name.toLowerCase().includes(v)))
+}
+
+function filterFood(t){
+loadRestaurants(restaurants.filter(r=>r.type==t))
+}
+
+function openMenu(i){
+let r=restaurants[i],h=`<h2>${r.name} Menu</h2>`
+r.menu.forEach(m=>h+=`<p>${m.name} - ₹${m.price} <button onclick="addCart('${m.name}',${m.price})">Add</button></p>`)
+menu.innerHTML=h
+}
+
+function addCart(n,p){
+cart.push({n,p})
+saveData()
+renderCart()
+notify("Added to cart")
+}
+
+function removeItem(index){
+cart.splice(index,1)
+saveData()
+renderCart()
+notify("Item removed")
+}
+
+function renderCart(){
+let t=0;cartDiv.innerHTML=""
+cart.forEach((i,index)=>{t+=i.p;cartDiv.innerHTML+=`<p>${i.n} ₹${i.p} <button onclick="removeItem(${index})">Cancel</button></p>`})
+total.innerText="Total ₹"+t
+}
+
+const cartDiv=document.getElementById("cart")
+
+function checkout(){
+if(!cart.length){alert("Cart empty");return}
+let payment=document.getElementById("payment").value
+
+let time=new Date().toLocaleTimeString()
+
+// Current orders only
+orders.push({items:[...cart],status:"Preparing",payment,placed:time})
+cart=[]
+
+saveData()
+renderCart()
+renderOrders()   // current orders only
+
+notify("Order placed using "+payment)
+
+let msg=document.createElement("div")
+msg.className="thank"
+msg.innerHTML="<h1>Thank You For Ordering ❤️ <br> Visit Again</h1>" 
+document.body.appendChild(msg)
+
+setTimeout(()=>{msg.remove()},3000)
+
+// Track the last order
+track(orders.length-1)
+}
+
+const ordersDiv=document.getElementById("orders")
+const orderHistoryDiv=document.getElementById("orderHistory")
+
+function renderOrders(){
+ordersDiv.innerHTML=""
+orders.forEach((o,i)=>{
+ordersDiv.innerHTML+=`<p>
+Order ${i+1}: ${o.status}<br>
+Placed: ${o.placed}<br>
+Payment: ${o.payment}
+</p>`
+})
+}
+
+// ONLY show orders which are delivered in history
+function renderHistory(){
+orderHistoryDiv.innerHTML=""
+orders.forEach((o,i)=>{
+if(o.status=="Delivered"){
+let items=o.items.map(x=>x.n).join(", ")
+orderHistoryDiv.innerHTML+=`<p>
+Order ${i+1}: ${items} | Payment: ${o.payment} | Placed: ${o.placed} | Delivered: ${o.delivered}
+</p>`
+}
+})
+}
+
+function track(i){
+setTimeout(()=>{orders[i].status="Cooking";saveData();renderOrders()},4000)
+setTimeout(()=>{orders[i].status="Out for delivery";saveData();renderOrders()},8000)
+setTimeout(()=>{
+orders[i].status="Delivered"
+orders[i].delivered=new Date().toLocaleTimeString()
+saveData()
+renderOrders()
+renderHistory()   // update history only when delivered
+},12000)
+}
+
+function notify(t){
+notifyBox.innerText=t
+notifyBox.style.right="20px"
+setTimeout(()=>notifyBox.style.right="-300px",2500)
+}
+
+const notifyBox=document.getElementById("notify")
+
+renderCart()
+renderOrders()
+renderHistory()
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Home Food</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#f5f5f5}
+
+/* WELCOME */
+.welcome{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+color:#fff;
+text-align:center;
+background:linear-gradient(135deg,#ff512f,#dd2476);
+position:relative;
+overflow:hidden;
+}
+.welcome h1{font-size:60px;animation:glow 2s infinite alternate}
+@keyframes glow{
+from{text-shadow:0 0 10px #fff}
+to{text-shadow:0 0 30px yellow}
+}
+.startBtn{
+padding:12px 30px;
+background:#fff;
+border:none;
+border-radius:30px;
+cursor:pointer;
+font-size:18px;
+margin-top:20px;
+}
+.float{position:absolute;font-size:35px;animation:float 8s linear infinite}
+@keyframes float{
+0%{transform:translateY(100vh)}
+100%{transform:translateY(-10vh)}
+}
+
+/* LOGIN */
+.login{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#222;
+}
+.box{background:#fff;padding:40px;border-radius:10px;width:300px;text-align:center}
+.box input{width:100%;padding:10px;margin:10px 0}
+
+/* NAV */
+.nav{background:#ff3c00;color:#fff;display:flex;justify-content:space-between;padding:15px}
+.logo{font-weight:bold}
+
+/* CARDS */
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+padding:20px;
+}
+.card{
+background:#fff;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 4px 10px rgba(0,0,0,.2);
+cursor:pointer;
+}
+.card img{width:100%;height:150px;object-fit:cover}
+.card h3{padding:10px}
+
+.btn{background:#ff3c00;color:#fff;border:none;padding:6px 12px;margin:5px;cursor:pointer}
+
+/* CART ICON */
+.cartIcon{
+position:fixed;
+bottom:25px;
+right:25px;
+background:#ff5722;
+color:#fff;
+width:60px;
+height:60px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:25px;
+cursor:pointer;
+z-index:999;
+}
+#cartCount{
+position:absolute;
+top:-5px;
+right:-5px;
+background:red;
+color:#fff;
+width:22px;
+height:22px;
+border-radius:50%;
+font-size:13px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+/* SUCCESS */
+.successBox{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100vh;
+background:linear-gradient(135deg,#ff9966,#ff5e62);
+color:white;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+z-index:9999;
+}
+</style>
+</head>
+<body>
+
+<div class="cartIcon" onclick="toggleCart()">
+🛒 <span id="cartCount">0</span>
+</div>
+
+<!-- WELCOME -->
+<div class="welcome" id="welcome">
+<h1>🍲 Home Food 🍛</h1>
+<button class="startBtn" onclick="startApp()">Get Started</button>
+<span class="float" style="left:10%">🍕</span>
+<span class="float" style="left:40%;animation-delay:2s">🍔</span>
+<span class="float" style="left:70%;animation-delay:4s">🍟</span>
+</div>
+
+<!-- LOGIN -->
+<div class="login" id="login" style="display:none">
+<div class="box">
+<h2>Login</h2>
+<input id="email" placeholder="Email (@college.com)">
+<input id="pass" type="password" placeholder="Password">
+<button class="btn" onclick="loginUser()">Login</button>
+</div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+
+<div class="nav">
+<div class="logo">Home Food</div>
+</div>
+
+<h2 style="text-align:center;margin-top:20px;">Restaurants</h2>
+<div class="cards" id="restaurants"></div>
+
+<div id="menu" style="padding:20px"></div>
+
+<!-- CART -->
+<div id="cartSection" style="display:none;padding:20px">
+<h2>Cart</h2>
+<div id="cart"></div>
+<h3 id="total"></h3>
+<button class="btn" onclick="openCheckout()">Place Order</button>
+</div>
+
+<!-- CHECKOUT -->
+<div id="checkoutSection" style="display:none;padding:20px">
+<h2>Checkout</h2>
+<div id="checkoutItems"></div>
+<h3 id="checkoutTotal"></h3>
+<input id="custName" placeholder="Name"><br>
+<input id="college" placeholder="College"><br>
+<input id="address" placeholder="Address"><br>
+<input id="pincode" placeholder="Pincode"><br>
+<input id="upi" placeholder="UPI ID"><br>
+<button class="btn" onclick="processPayment()">Pay</button>
+</div>
+
+<div id="tracking" style="padding:20px;color:#ff3c00;font-weight:bold"></div>
+
+</div>
+
+<div id="successMessage" class="successBox">
+<h1>🎉 Order Confirmed!</h1>
+<p>Food is on the way 😋</p>
+<button class="btn" onclick="closeSuccess()">Continue</button>
+</div>
+
+<script>
+
+let restaurants=[
+{
+name:"Tiffin Center",
+img:"https://source.unsplash.com/400x300/?south-indian-food",
+menu:[
+{name:"Idly",price:40},
+{name:"Dosa",price:60}
+]
+},
+{
+name:"Pizza Corner",
+img:"https://source.unsplash.com/400x300/?pizza",
+menu:[
+{name:"Margherita Pizza",price:180},
+{name:"Farmhouse Pizza",price:220}
+]
+}
+];
+
+let cart=[];
+
+/* START */
+function startApp(){
+document.getElementById("welcome").style.display="none";
+document.getElementById("login").style.display="flex";
+}
+
+/* LOGIN */
+function loginUser(){
+let email=document.getElementById("email").value;
+let pass=document.getElementById("pass").value;
+
+if(!email.endsWith("@college.com")){
+alert("Use @college.com email");
+return;
+}
+
+document.getElementById("login").style.display="none";
+document.getElementById("app").style.display="block";
+loadRestaurants();
+}
+
+/* LOAD RESTAURANTS */
+function loadRestaurants(){
+let box=document.getElementById("restaurants");
+box.innerHTML="";
+restaurants.forEach((r,i)=>{
+box.innerHTML+=`
+<div class="card" onclick="showMenu(${i})">
+<img src="${r.img}">
+<h3>${r.name}</h3>
+</div>`;
+});
+}
+
+/* SHOW MENU */
+function showMenu(i){
+let r=restaurants[i];
+let m=document.getElementById("menu");
+m.innerHTML=`<h2>${r.name} Menu</h2>`;
+r.menu.forEach(item=>{
+m.innerHTML+=`
+<div>
+${item.name} - ₹${item.price}
+<button onclick="addToCart('${item.name}',${item.price})">Add</button>
+</div>`;
+});
+}
+
+/* CART */
+function addToCart(name,price){
+let existing=cart.find(x=>x.name===name);
+if(existing) existing.qty++;
+else cart.push({name,price,qty:1});
+updateCart();
+}
+
+function updateCart(){
+let c=document.getElementById("cart");
+let total=0;
+c.innerHTML="";
+cart.forEach((item,i)=>{
+total+=item.price*item.qty;
+c.innerHTML+=`
+<div>
+${item.name} - ${item.qty}
+<button onclick="changeQty(${i},1)">+</button>
+<button onclick="changeQty(${i},-1)">-</button>
+</div>`;
+});
+document.getElementById("total").innerText="Total ₹"+total;
+document.getElementById("cartCount").innerText=cart.reduce((a,b)=>a+b.qty,0);
+}
+
+function changeQty(i,val){
+cart[i].qty+=val;
+if(cart[i].qty<=0) cart.splice(i,1);
+updateCart();
+}
+
+function toggleCart(){
+let sec=document.getElementById("cartSection");
+sec.style.display=sec.style.display==="none"?"block":"none";
+}
+
+/* CHECKOUT */
+function openCheckout(){
+if(cart.length===0){alert("Cart Empty");return;}
+document.getElementById("checkoutSection").style.display="block";
+let box=document.getElementById("checkoutItems");
+let total=0;
+box.innerHTML="";
+cart.forEach(item=>{
+total+=item.price*item.qty;
+box.innerHTML+=`<p>${item.name} × ${item.qty}</p>`;
+});
+document.getElementById("checkoutTotal").innerText="Total ₹"+total;
+}
+
+function processPayment(){
+document.getElementById("successMessage").style.display="flex";
+cart=[];
+updateCart();
+}
+
+function closeSuccess(){
+document.getElementById("successMessage").style.display="none";
+startTracking();
+}
+
+function startTracking(){
+let t=document.getElementById("tracking");
+t.innerHTML="👨‍🍳 Cooking...";
+setTimeout(()=>{t.innerHTML="🛵 On the way..."},3000);
+setTimeout(()=>{t.innerHTML="✅ Delivered!"},6000);
+}
+
+</script>
+</body>
+</html>

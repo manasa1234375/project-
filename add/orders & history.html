@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function renderOrders(){
+ordersDiv.innerHTML=""
+orders.forEach((o,i)=>ordersDiv.innerHTML+=`<p>
+Order ${i+1}: ${o.status}<br>
+Placed: ${o.placed}<br>
+Payment: ${o.payment}
+</p>`)
+}
+
+function renderHistory(){
+orderHistory.innerHTML=""
+history.forEach((o,i)=>{
+let items=o.items.map(x=>x.n).join(", ")
+orderHistory.innerHTML+=`<p>
+Order ${i+1}: ${items} | Payment: ${o.payment} | Time: ${o.time}
+</p>`
+})
+}
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

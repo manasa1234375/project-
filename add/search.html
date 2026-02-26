@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function searchRestaurant(){
+let v=search.value.toLowerCase()
+loadRestaurants(restaurants.filter(r=>r.name.toLowerCase().includes(v)))
+}
+
+function filterFood(t){
+loadRestaurants(restaurants.filter(r=>r.type==t))
+}
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function checkout(){
+if(!cart.length){alert("Cart empty");return}
+let payment=document.getElementById("payment").value
+let time=new Date().toLocaleTimeString()
+
+orders.push({items:[...cart],status:"Preparing",payment,placed:time})
+history.push({items:[...cart],payment,time})
+cart=[]
+saveData()
+renderCart()
+renderOrders()
+renderHistory()
+track(orders.length-1)
+notify("Order placed using "+payment)
+let msg=document.createElement("div")
+msg.className="thank"
+msg.innerHTML="<h1>Thank You For Ordering ❤️ <br> Visit Again</h1>" 
+document.body.appendChild(msg)
+setTimeout(()=>{msg.remove()},3000)
+}
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

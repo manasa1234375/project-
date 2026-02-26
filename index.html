@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Home Food App</title>
+<style>
+body{margin:0;font-family:Arial;background:#f5f5f5}
+.header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:#ff6b6b;color:white}
+.logo{font-size:22px;font-weight:bold}
+.topNav span{margin-left:20px;cursor:pointer;font-size:14px}
+.page{display:none;padding:20px}
+.active{display:block}
+.blurContent{filter:blur(5px);pointer-events:none}
+#welcome{height:90vh;background:url('https://images.unsplash.com/photo-1504674900247-0877df9cc836') center/cover no-repeat;display:flex;justify-content:center;align-items:center;color:white;position:relative;text-align:center}
+#welcome::before{content:"";position:absolute;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px)}
+.welcomeContent{position:relative}
+input{width:100%;padding:8px;margin:5px 0;border-radius:5px;border:1px solid #ccc}
+button{background:#ff6b6b;color:white;border:none;padding:8px 15px;border-radius:5px;cursor:pointer}
+.link{color:#ff6b6b;cursor:pointer;font-size:14px;margin-top:10px;display:inline-block}
+/* restaurant card */
+.restaurantCard{background:white;border-radius:12px;overflow:hidden;margin:20px 0;box-shadow:0 4px 10px rgba(0,0,0,0.08);transition:0.3s;display:flex;flex-direction:column}
+.restaurantCard img{width:100%;height:180px;object-fit:cover}
+.restaurantCard h3{margin:10px}
+.restaurantCard p{margin:0 10px 10px 10px;color:gray;font-size:14px}
+.restaurantCard button{margin:0 10px 10px 10px;padding:8px 15px;border:none;border-radius:5px;background:#ff6b6b;color:white;cursor:pointer}
+/* item list */
+.item{display:flex;justify-content:space-between;margin:8px 0}
+.qty button{padding:4px 10px;margin:0 5px}
+/* checkout */
+.checkoutContainer{display:flex;gap:20px}
+.left,.right{flex:1;background:white;padding:15px;border-radius:10px}
+/* popups */
+.successPopup, .thankYouPopup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:30px;border-radius:10px;box-shadow:0 0 20px rgba(0,0,0,0.3);text-align:center;z-index:1000;display:none;animation:popup 0.3s ease}
+@keyframes popup{from{transform:translate(-50%,-50%) scale(0.7);}to{transform:translate(-50%,-50%) scale(1);}}
+.orderBox{background:#fff1f0;padding:10px;margin:10px 0;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+</style>
+</head>
+<body>
+
+<div id="mainContent">
+
+<div class="header">
+<div class="logo">🍱 Home Food</div>
+<div class="topNav">
+<span onclick="checkLogin('restaurants')">🏠 Home</span>
+<span onclick="checkLogin('tracking')">🚚 Tracking</span>
+<span onclick="checkLogin('history')">📜 History</span>
+<span onclick="checkLogin('profile')">👤 Profile</span>
+<span onclick="checkLogin('contact')">📞 Contact</span>
+<span onclick="showCheckout()">🛒 (<span id="cartCount">0</span>)</span>
+<span onclick="showPage('adminLogin')">🛡️ Admin</span>
+</div>
+</div>
+
+<!-- WELCOME -->
+<div id="welcome" class="page active">
+<div class="welcomeContent">
+<h1>Fresh & Tasty Amma Vanta ❤️</h1>
+<button onclick="showPage('signup')">Get Started</button>
+</div>
+</div>
+
+<!-- SIGNUP -->
+<div id="signup" class="page">
+<h2>Create Account</h2>
+<input type="email" id="signupEmail" placeholder="Email">
+<input type="password" id="signupPass" placeholder="Password">
+<input type="password" id="signupConfirm" placeholder="Confirm Password">
+<button onclick="signup()">Sign Up</button>
+<div class="link" onclick="showPage('signin')">Already have account? Sign In</div>
+</div>
+
+<!-- SIGNIN -->
+<div id="signin" class="page">
+<h2>Sign In</h2>
+<input type="email" id="signinEmail" placeholder="Email">
+<input type="password" id="signinPass" placeholder="Password">
+<button onclick="signin()">Login</button>
+</div>
+
+<!-- RESTAURANTS -->
+<div id="restaurants" class="page">
+<h2>Restaurants</h2>
+<div id="restaurantList"></div>
+</div>
+
+<!-- ITEMS PAGE -->
+<div id="itemsPage" class="page">
+<h2 id="itemsTitle"></h2>
+<div id="itemsList"></div>
+<button onclick="showPage('restaurants')">⬅ Back to Restaurants</button>
+</div>
+
+<!-- CHECKOUT -->
+<div id="checkout" class="page">
+<div class="checkoutContainer">
+<div class="left">
+<h3>Your Order</h3>
+<div id="orderList"></div>
+<p>Total: ₹<span id="totalAmount">0</span></p>
+</div>
+<div class="right">
+<h3>Payment</h3>
+<input id="name" placeholder="Name">
+<input id="college" placeholder="College">
+<input id="address" placeholder="Address">
+<input id="pin" placeholder="Pin Code">
+<input id="upi" placeholder="UPI ID">
+<button onclick="payNow()">Place Order</button>
+</div>
+</div>
+</div>
+
+<!-- TRACKING -->
+<div id="tracking" class="page">
+<h2>Order Tracking</h2>
+<div id="trackingSteps"></div>
+</div>
+
+<!-- HISTORY -->
+<div id="history" class="page">
+<h2>Order History</h2>
+<div id="historyList"></div>
+</div>
+
+<!-- PROFILE -->
+<div id="profile" class="page">
+<h2>User Profile</h2>
+<p>Email: <span id="profileEmail"></span></p>
+<p>Total Orders: <span id="totalOrders">0</span></p>
+<p>Total Amount: ₹<span id="totalSpent">0</span></p>
+<p>Total Items: <span id="totalItems">0</span></p>
+</div>
+
+<!-- CONTACT -->
+<div id="contact" class="page">
+<h2>Contact Us</h2>
+<p>📍 Address: 123, Amma Vanta Street, College City</p>
+<p>📞 Phone: +91 9876543210</p>
+<p>✉️ Email: contact@homefood.com</p>
+<p>🔗 Social Media:</p>
+<ul>
+<li>Facebook: <a href="#" target="_blank">facebook.com/homefood</a></li>
+<li>Instagram: <a href="#" target="_blank">instagram.com/homefood</a></li>
+<li>Twitter: <a href="#" target="_blank">twitter.com/homefood</a></li>
+</ul>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLogin" class="page">
+<h2>Admin Login</h2>
+<input type="text" id="adminName" placeholder="Name">
+<input type="email" id="adminEmail" placeholder="Email">
+<input type="password" id="adminPass" placeholder="Password">
+<button onclick="adminLogin()">Login as Admin</button>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="adminDashboard" class="page">
+<h2>Admin Dashboard</h2>
+<div id="adminOrders"></div>
+</div>
+
+</div> <!-- mainContent -->
+
+<!-- POPUPS -->
+<div id="successPopup" class="successPopup">
+<h2>🎉 Payment Successful!</h2>
+<p>Your food is being prepared 👨‍🍳🔥</p>
+</div>
+<div id="thankYouPopup" class="thankYouPopup">
+<h2>🙏 Thank you! Visit Again ❤️🍽️</h2>
+</div>
+
+<script>
+let currentUser=null, cart=[], orders=[], totalSpent=0, totalItems=0, admin={logged:false};
+
+// SHOW PAGE
+function showPage(id){
+document.querySelectorAll('.page').forEach(p=>p.style.display="none");
+document.getElementById(id).style.display="block";
+}
+
+// SIGNUP / SIGNIN
+function signup(){
+let e=document.getElementById("signupEmail").value;
+let p=document.getElementById("signupPass").value;
+let c=document.getElementById("signupConfirm").value;
+if(!e||!p||!c){alert("Fill all fields");return;}
+if(p!==c){alert("Passwords do not match");return;}
+localStorage.setItem(e,p);alert("Account Created! Login Now"); showPage("signin");
+}
+function signin(){
+let e=document.getElementById("signinEmail").value;
+let p=document.getElementById("signinPass").value;
+if(localStorage.getItem(e)===p){currentUser=e;document.getElementById("profileEmail").innerText=e;showPage("restaurants");}
+else{alert("Invalid Credentials ❌");}
+}
+function checkLogin(page){if(!currentUser){alert("Please Login 🔐");showPage("signin");}else{showPage(page);}}
+
+// CART
+function changeQty(name,price,change){
+let item=cart.find(i=>i.name===name);
+if(change==1){if(item)item.qty++; else cart.push({name,price,qty:1});}
+if(change==-1 && item){item.qty--; if(item.qty<=0) cart=cart.filter(i=>i.name!==name);}
+updateCart();
+}
+function updateCart(){document.getElementById("cartCount").innerText=cart.reduce((s,i)=>s+i.qty,0);}
+function showCheckout(){if(!currentUser){alert("Login First");showPage("signin");return;}
+if(cart.length==0){alert("Cart Empty");return;}
+showPage("checkout");let list="", total=0;
+cart.forEach(i=>{list+=`<p>${i.name} x ${i.qty} - ₹${i.price*i.qty}</p>`; total+=i.price*i.qty;});
+document.getElementById("orderList").innerHTML=list;document.getElementById("totalAmount").innerText=total;
+}
+
+// PAYMENT
+function payNow(){
+let name=document.getElementById("name").value;
+let college=document.getElementById("college").value;
+let address=document.getElementById("address").value;
+let pin=document.getElementById("pin").value;
+let upi=document.getElementById("upi").value;
+if(!name||!college||!address||!pin||!upi){alert("Fill all details");return;}
+document.getElementById("mainContent").classList.add("blurContent");
+document.getElementById("successPopup").style.display="block";
+setTimeout(()=>{document.getElementById("mainContent").classList.remove("blurContent");document.getElementById("successPopup").style.display="none";startTracking();},4000);
+orders.push({date:new Date().toDateString(),items:[...cart]});
+totalSpent+=cart.reduce((s,i)=>s+i.price*i.qty,0); totalItems+=cart.reduce((s,i)=>s+i.qty,0);
+document.getElementById("totalOrders").innerText=orders.length; document.getElementById("totalSpent").innerText=totalSpent; document.getElementById("totalItems").innerText=totalItems;
+cart=[]; updateCart(); updateHistory();
+}
+
+// RESTAURANTS
+const restaurantsData=[
+{name:"south indian thali ",rating:4.3,time:"25-30 mins",distance:"2.1 km",img:"https://img.freepik.com/premium-photo/traditional-south-indian-meal-food-served-big-banana-leaf-food-platter-complete-thali-selective-focus_466689-50749.jpg?w=2000",items:[{name:"Veg Biryani",price:120},{name:"veg Meals",price:100},{name:"Chicken Pulihora",price:150},{name:"non veg meals",price:280}]},
+{name:"Andhra Spice",rating:4.5,time:"30-35 mins",distance:"3.0 km",img:"https://images.unsplash.com/photo-1617196033277-71ff5c1d0d50",items:[{name:"Andhra Chicken Curry",price:220},{name:"Gongura Mutton",price:300},{name:"Pesarattu",price:90},{name:"Andhra Veg Thali",price:180}]},
+{name:"Spicy Kitchen",rating:4.6,time:"30-35 mins",distance:"3.4 km",img:"https://images.unsplash.com/photo-1617196033277-71ff5c1d0d50",items:[{name:"Chicken Biryani",price:180},{name:"Fried Rice",price:140},{name:"mutton biriyani",price:260},{name:"spicy nali ghost biriyani ",price:4200},{name:"Paneer Butter Masala",price:160},{name:"prawn biriyani",price:380}]},
+{name:"Tasty Tiffin",rating:4.2,time:"20-25 mins",distance:"1.8 km",img:"https://images.unsplash.com/photo-1540189549336-e6e99c3679fe",items:[{name:"Masala Dosa",price:80},{name:"Idli Vada",price:60},{name:"Sambar Rice",price:90},{name:"Rava Upma",price:70}]},
+{name:"Curry House",rating:4.5,time:"25-30 mins",distance:"2.5 km",img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836",items:[{name:"Butter Chicken",price:200},{name:"Dal Makhani",price:150},{name:"Naan",price:40},{name:"Veg Pulao",price:130}]},
+{name:"Green Leaf",rating:4.4,time:"30-35 mins",distance:"3.0 km",img:"https://images.unsplash.com/photo-1525610553991-2bede1a236e2",items:[{name:"Paneer Tikka",price:170},{name:"Veg Biryani",price:120},{name:"Dal Fry",price:110},{name:"Roti",price:30}]},
+{name:"Burger King",rating:4.0,time:"15-20 mins",distance:"1.2 km",img:"https://images.unsplash.com/photo-1550547660-d9450f859349",items:[{name:"Whopper",price:150},{name:"Veggie Burger",price:120},{name:"Fries",price:80},{name:"Coke",price:50}]},
+{name:"Pizza Planet",rating:4.3,time:"20-25 mins",distance:"2.8 km",img:"https://images.unsplash.com/photo-1548365328-9c0a1eaa1b9c",items:[{name:"Margherita Pizza",price:200},{name:"Pepperoni Pizza",price:250},{name:"Veggie Pizza",price:220},{name:"Garlic Bread",price:90}]},
+{name:"Sushi World",rating:4.7,time:"30-35 mins",distance:"3.5 km",img:"https://images.unsplash.com/photo-1562158070-9b9c1a1e8b2c",items:[{name:"California Roll",price:300},{name:"Spicy Tuna Roll",price:350},{name:"Veggie Roll",price:250},{name:"Miso Soup",price:80}]},
+{name:"Dessert Delights",rating:4.5,time:"15-20 mins",distance:"1.5 km",img:"https://images.unsplash.com/photo-1505253210343-9e0aabf8cfae",items:[{name:"Chocolate Brownie",price:120},{name:"Cheesecake",price:150},{name:"Ice Cream Sundae",price:100},{name:"Gulab Jamun",price:80}]},
+{name:"Healthy Bites",rating:4.6,time:"20-25 mins",distance:"2.0 km",img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836",items:[{name:"Grilled Chicken Salad",price:180},{name:"Quinoa Bowl",price:150},{name:"Veggie Wrap",price:120},{name:"Fruit Smoothie",price:90}]},
+{name:"ice cream world",rating:4.8,time:"10-15 mins",distance:"1.0 km",img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836",items:[{name:"Vanilla Ice Cream",price:80},{name:"Chocolate Ice Cream",price:90},{name:"Strawberry Ice Cream",price:85},{name:"Mango Ice Cream",price:95}]}
+
+];
+function showRestaurants(){
+let html="";restaurantsData.forEach((r,i)=>{html+=`<div class="restaurantCard"><img src="${r.img}"><h3>${r.name}</h3><p>⭐ ${r.rating} • 🕒 ${r.time} • 📍 ${r.distance}</p><button onclick="viewMenu(${i})">View Menu</button></div>`;});
+document.getElementById("restaurantList").innerHTML=html;
+}
+function viewMenu(index){
+let r=restaurantsData[index];
+document.getElementById("itemsTitle").innerText=r.name+" Menu";
+let html="";
+r.items.forEach(i=>{html+=`<div class="item"><span>${i.name} ₹${i.price}</span><div class="qty"><button onclick="changeQty('${i.name}',${i.price},-1)">-</button><button onclick="changeQty('${i.name}',${i.price},1)">+</button></div></div>`;});
+document.getElementById("itemsList").innerHTML=html;
+showPage("itemsPage");
+}
+
+// TRACKING
+function startTracking(){
+showPage("tracking");
+let steps=["👨‍🍳 Cooking","🍲 Preparing","🛵 Out for Delivery","📦 Delivered"];
+let container=document.getElementById("trackingSteps");
+container.innerHTML=""; let i=0;
+let interval=setInterval(()=>{container.innerHTML+=`<div class="restaurant">${steps[i]}</div>`; i++; if(i==steps.length){clearInterval(interval);showThankYou();}},3000);
+}
+function showThankYou(){
+document.getElementById("mainContent").classList.add("blurContent");
+document.getElementById("thankYouPopup").style.display="block";
+setTimeout(()=>{document.getElementById("thankYouPopup").style.display="none";document.getElementById("mainContent").classList.remove("blurContent");document.getElementById("trackingSteps").innerHTML="";},4000);
+}
+
+// HISTORY
+function updateHistory(){
+let today=new Date().toDateString();
+let html="";
+orders.filter(o=>o.date==today).forEach(o=>{html+="<div class='restaurant'>"; o.items.forEach(i=>html+=`<p>${i.name} x ${i.qty}</p>`); html+="</div>";});
+document.getElementById("historyList").innerHTML=html;
+}
+
+// ADMIN
+function adminLogin(){
+let name=document.getElementById("adminName").value;
+let email=document.getElementById("adminEmail").value;
+let pass=document.getElementById("adminPass").value;
+if(!name||!email||!pass){alert("Fill all fields"); return;}
+admin={name,email,pass,logged:true};
+showAdminDashboard();
+}
+
+function showAdminDashboard(){
+if(!admin.logged) return;
+showPage("adminDashboard");
+let html="";
+orders.forEach((o,i)=>{
+let total=o.items.reduce((s,it)=>s+it.price*it.qty,0);
+let commission=(total*20)/100;
+html+=`<div class="orderBox"><h4>Order #${i+1}</h4><p>Date: ${o.date}</p>`;
+o.items.forEach(it=>{html+=`<p>${it.name} x ${it.qty} - ₹${it.price*it.qty}</p>`;});
+html+=`<p><b>Total Amount: ₹${total}</b></p><p><b>Admin Commission 20%: ₹${commission}</b></p></div>`;
+});
+document.getElementById("adminOrders").innerHTML=html;
+}
+
+// INIT
+showRestaurants();
+</script>
+</body>
+</html>

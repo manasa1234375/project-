@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function addCart(n,p){
+cart.push({n,p})
+saveData()
+renderCart()
+notify("Added to cart")
+}
+
+function removeItem(index){
+cart.splice(index,1)
+saveData()
+renderCart()
+notify("Item removed")
+}
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

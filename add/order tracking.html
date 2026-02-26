@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function track(i){
+setTimeout(()=>{orders[i].status="Cooking";saveData();renderOrders()},8000)
+setTimeout(()=>{orders[i].status="Out for delivery";saveData();renderOrders()},12000)
+setTimeout(()=>{
+orders[i].status="Delivered"
+orders[i].delivered=new Date().toLocaleTimeString()
+saveData()
+renderOrders()
+},12000)
+}
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
